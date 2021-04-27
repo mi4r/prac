@@ -85,35 +85,3 @@ int main()
 
     return 0;
 }
-/*
-<S> ::= <while> | <if>
-
-while(x<5){  }
-
-@begin:
-print "Ýòî õîä íîìåð" ?turn ;
-buy 2 ?raw_price ;
-sell ?production(?my_id) ?production_price ;
-$toprod = 2;
-if ?raw(?my_id) < $toprod then
-    $toprod = ?raw(?my_id);
-prod $toprod ;
-endturn ;
-goto @begin ;
-
-<S> ::= <while> | <if>
-<while> ::= "while" <bexpr> "do" <statement> ";"
-//<expression> ::= <aexpr> | <bexpr>
-<bexpr> ::= "!" <bexpr>
-        | <bexpr> "&" <bexpr>
-        | <aexpr> "<" <aexpr>
-<statement> ::= <assignment>
-<assignment> ::= <var> ":=" <aexpr>
-
-
-while $x < 5 do
-  $x := 77;
-
-parser_while()
-
-*/
