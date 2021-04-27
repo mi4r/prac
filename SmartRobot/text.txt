@@ -1,0 +1,13 @@
+	$a:=2;
+	$b:=585;
+@cycle:
+	if $a>$b then
+	    goto @exit;
+	$b := $b-47+2*12;
+	goto @cycle;
+@exit:
+	print "Exit from cycle";
+	buy 4 ?raw_price;
+	build 1;
+	sell ?production(?my_id) 550;
+	prod $a;
