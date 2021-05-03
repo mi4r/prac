@@ -1,4 +1,4 @@
-	$a:=2;
+ 	$a:=2;
 	$b:=585;
 @cycle:
 	if $a>$b then

@@ -32,6 +32,7 @@ Lexer::Lexer(void)
     save = -1;
     ErrorFlag = -1;
     LineBreakFlag = false;
+    FlagEOF = false;
     //memset(&buf, 0, sizeof(buf));
 }
 
@@ -40,7 +41,7 @@ Lexer::~Lexer()
     delete [] buf;
 }
 
-bool isEnding(char c)
+bool isEnding(int c)
 {
     if (c == ' ' || c == '\t' || c == '\n' ||  c == '+' || c == '-' || c == '*'|| c == '/'
         || c == '%' || c == '<' || c == '>' || c == '=' || c == ':' || c == ','|| c == ';'
@@ -49,7 +50,7 @@ bool isEnding(char c)
     else return false;
 }
 
-bool isSeparators(char c)
+bool isSeparators(int c)
 {
     if (c == '+' || c == '-' || c == '*'|| c == '/' || c == '%' || c == '<'|| c == '>'
         || c == '=' || c == ':' || c == ',' || c == ';' || c == '&' || c == '|' || c == '!' || c == '('
@@ -150,11 +151,14 @@ Lexem * Lexer::start(int c)
         reserv[0] = '\0';
         return pLexem;
     }
-    return nullptr;
+    Lexem * pLexem = new Lexem;
+    pLexem->text = 0;
+    return pLexem;
 }
 
 Lexem * Lexer::makeDigit(int c)
 {
+    Lexem * pLexem = new Lexem;
     if (isdigit(c))
     {
         if (cur >= size)
@@ -164,7 +168,6 @@ Lexem * Lexer::makeDigit(int c)
     else if (isEnding(c))
     {
         state = s_start;
-        Lexem * pLexem = new Lexem;
         if (isSeparators(c))
         {
             save = c;
@@ -182,11 +185,13 @@ Lexem * Lexer::makeDigit(int c)
             ErrorFlag = digit_unknown;
         state = s_error;
     }
-    return nullptr;
+    pLexem->text = 0;
+    return pLexem;
 }
 
 Lexem * Lexer::makeString(int c)
 {
+    Lexem * pLexem = new Lexem;
     if (c != '"')
     {
         if (cur >= size)
@@ -199,17 +204,18 @@ Lexem * Lexer::makeString(int c)
             buf = extendBuf();
         buf[cur] = c;
         state = s_start;
-        Lexem * pLexem = new Lexem;
         pLexem->text = strdup(buf);
         pLexem->type = string;
         pLexem->line = LineCounter;
         return pLexem;
     }
-    return nullptr;
+    pLexem->text = 0;
+    return pLexem;
 }
 
 Lexem * Lexer::makeIdentifier(int c)
 {
+    Lexem * pLexem = new Lexem;
     if (isalnum(c) || c == '_')
     {
         if (cur >= size)
@@ -219,7 +225,6 @@ Lexem * Lexer::makeIdentifier(int c)
     else if (isEnding(c))
     {
         state = s_start;
-        Lexem * pLexem = new Lexem;
         if (isSeparators(c))
         {
             save = c;
@@ -239,11 +244,13 @@ Lexem * Lexer::makeIdentifier(int c)
         ErrorFlag = id_unknown;
         state = s_error;
     }
-    return nullptr;
+    pLexem->text = 0;
+    return pLexem;
 }
 
 Lexem * Lexer::makeKeyWord(int c)
 {
+    Lexem * pLexem = new Lexem;
     if (isalpha(c))
     {
         if (cur >= size)
@@ -253,7 +260,6 @@ Lexem * Lexer::makeKeyWord(int c)
     else if (isEnding(c))
     {
         state = s_start;
-        Lexem * pLexem = new Lexem;
         if (isSeparators(c))
         {
             save = c;
@@ -273,16 +279,17 @@ Lexem * Lexer::makeKeyWord(int c)
             ErrorFlag = keyWord_unknown;
         state = s_error;
     }
-    return nullptr;
+    pLexem->text = 0;
+    return pLexem;
 }
 
 Lexem * Lexer::makeAssign(int c)
 {
+    Lexem * pLexem = new Lexem;
     if (c == '=')
     {
         buf[cur] = c;
         state = s_start;
-        Lexem *pLexem = new Lexem;
         pLexem->text = strdup(buf);
         pLexem->type = assign;
         pLexem->line = LineCounter;
@@ -291,7 +298,6 @@ Lexem * Lexer::makeAssign(int c)
     else
     {
         state = s_start;
-        Lexem * pLexem = new Lexem;
         if (isSeparators(c))
         {
             save = c;
@@ -301,17 +307,9 @@ Lexem * Lexer::makeAssign(int c)
         pLexem->line = LineCounter;
         return pLexem;
     }
-    return nullptr;
-}
-
-Lexem * Lexer::errorHandling(int c)
-{
-    Lexem * pLexem = new Lexem;
-    pLexem->type = -1;
-    pLexem->error = ErrorFlag;
+    pLexem->text = 0;
     return pLexem;
 }
-
 
 Lexem * Lexer::step(int c)
 {
@@ -336,10 +334,55 @@ Lexem * Lexer::step(int c)
             return makeAssign(c);
             break;
         case s_error:
-            return errorHandling(c);
             break;
     }
-    return nullptr;
+    Lexem * pLexem = new Lexem;
+    pLexem->text = nullptr;
+    return pLexem;
+}
+
+Lexem * Lexer::check(Lexem * lexeme)
+{
+    Lexem * tmp;
+    tmp = lexeme;
+    if (tmp->text == 0)
+    {
+        tmp->readiness = unready;
+    }
+    else
+    {
+        tmp->readiness = ready;
+    }
+    if (state == s_error)
+    {
+        tmp->readiness = err;
+        tmp->errStatus = ErrorFlag;
+    }
+
+    return tmp;
+}
+
+Lexem * Lexer::analysisStart(int c)
+{
+    if (c == EOF && !FlagEOF)
+    {
+        c = ' ';
+        FlagEOF = true;
+    }
+    Lexem * lexeme;
+    if (c == EOF && FlagEOF)
+    {
+        lexeme = new Lexem;
+        lexeme->readiness = eof;
+    }
+    else
+    {
+        lexeme = step(c);
+        lexeme = check(lexeme);
+    }
+    if (lexeme->readiness == eof || lexeme->readiness == err)
+        lexeme->ending = true;
+    return lexeme;
 }
 
 

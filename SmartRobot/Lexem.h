@@ -9,16 +9,14 @@ class Lexem
 {
 public:
     char * text;
-    // unsigned int m_sizeTextBuffer;
-
     int line;
     int type;
-    int error;
-    bool m_isFirstOfTwo;
-    //void addChar(char ch);
-    //void extendTextBuffer();
+    int errStatus;
+    int readiness;
+    bool ending;
+    Lexem();
     void Print();
-    void ErrorHandling(int save);
+    void ErrorHandling();
 };
 
 #endif //PROJECTSMARTROBOT_LEXEM_H

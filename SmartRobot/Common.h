@@ -14,6 +14,8 @@ enum TypeState {s_start, s_digit, s_string, s_identifier,
 enum TypeError {start_unknown, digit_letter, digit_unknown, id_unknown,
     keyWord_number, keyWord_unknown};
 
+enum TypeReadiness {ready, unready, eof, err};
+
 
 
 #endif //PROJECTSMARTROBOT_COMMON_H

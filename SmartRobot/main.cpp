@@ -2,44 +2,25 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <pwd.h>
 #include "Lexer.h"
 #include "Lexem.h"
 #include "Common.h"
 
-void analysis(Lexem * lexeme)
+void analysis()
 {
+    Lexem * lexeme;
     Lexer lexer;
     int c;
-    int flag = 1;
-    int save;
-    while (true)
+    while (!lexeme->ending)
     {
         c = getchar();
-        if (c == EOF && flag > 0)
-        {
-            c = ' ';
-            flag *=  -1;
-        }
-        if (c == EOF && flag < 0)
-            break;
-        lexeme = lexer.step(c);
-        if (lexeme != nullptr)
-        {
-            if (lexeme->type == -1)
-            {
-                lexeme->ErrorHandling(save);
-                break;
-            }
-            lexeme->Print();
-        }
-        save = c;
+        lexeme = lexer.analysisStart(c);
+        lexeme->Print();
     }
 }
 
 int main()
 {
-    Lexem * lexeme = NULL;
     int fd = -1;
     fd = open("text.txt", O_RDONLY);
     if (fd == -1)
@@ -47,7 +28,7 @@ int main()
     else
     {
         dup2(fd, STDIN_FILENO);
-        analysis(lexeme);
+        analysis();
         close(fd);
     }
 

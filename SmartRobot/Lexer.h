@@ -17,6 +17,7 @@ class Lexer
     int save;
     int ErrorFlag;
     bool LineBreakFlag;
+    bool FlagEOF;
     //int m_c;
     //bool m_saved;
     //Lexem * m_pLexem;
@@ -26,13 +27,14 @@ class Lexer
     Lexem * makeIdentifier(int c);
     Lexem * makeKeyWord(int c);
     Lexem * makeAssign(int c);
-    Lexem * errorHandling(int c);
     char * extendBuf();
     void initBuf();
+    Lexem * check(Lexem * lexeme);
+    Lexem * step(int c);
 public:
     Lexer(void);
     ~Lexer();
-    Lexem * step(int c);
+    Lexem * analysisStart(int c);
 };
 
 #endif //PROJECTSMARTROBOT_LEXER_H
