@@ -6,25 +6,31 @@
 #define PROJECTSMARTROBOT_PARSER_H
 
 #include "Lexem.h"
+#include "Lexer.h"
 
 class Parser
 {
-    Lexem CurLex;
+    Lexem * CurLex;
     void NextLex();
-    void KeyWordParse();
-    void FunctionParse();
-    void WhileParse();
-    void IfParse();
-    void BuildParse();
-    void BuyParse();
-    void SellParse();
-    void ProdParse();
-    void PrintParse();
-    void BoolExprParse();
-    void AssignmentExprParse();
-    void Statement();
+    void start_hdl();
+    void body_hdl();
+    void assign_hdl();
+    void if_hdl();
+    void while_hdl();
+    void in_hdl();
+    void print_hdl();
+    void func_hdl();
+    void func_tail_hdl();
+    void var_hdl();
+    void exp_hdl();
+    void exp5_hdl();
+    void exp4_hdl();
+    void exp3_hdl();
+    void exp2_hdl();
+    void exp1_hdl();
+    void exp0_hdl();
 public:
-    Parser(Lexem lexeme);
+    Parser(Lexem * lexeme);
     void Parse();
 };
 
